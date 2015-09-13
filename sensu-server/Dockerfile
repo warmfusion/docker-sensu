@@ -1,4 +1,4 @@
-FROM warmfusion/sensu
+FROM warmfusion/sensu:latest
 
 MAINTAINER Toby Jackson <toby@warmfusion.co.uk>
 

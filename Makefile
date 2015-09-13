@@ -1,12 +1,12 @@
 
 build:
 	make -C sensu
-	make -C sensu-client
+	make -C sensu-Client
 	make -C sensu-server
 	make -C sensu-api
 
 push:
-	docker push warmfusion/sensu
-	docker push warmfusion/sensu-client
-	docker push warmfusion/sensu-server
-	docker push warmfusion/sensu-api
+	make -C sensu push 
+	make -C sensu-Client push
+	make -C sensu-server push
+	make -C sensu-api push

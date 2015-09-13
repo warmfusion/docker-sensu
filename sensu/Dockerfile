@@ -9,7 +9,7 @@ RUN \
   apt-key add /tmp/pubkey.gpg \
   && echo 'deb http://repos.sensuapp.org/apt sensu main' > /etc/apt/sources.list.d/sensu.list \
   && apt-get update \
-  && apt-get install -y sensu \
+  && apt-get install -y sensu=0.20.3-1 \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY bootstrap-sensu-config.rb /bootstrap-sensu-config.rb
