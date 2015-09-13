@@ -29,9 +29,9 @@ ENV SENSU_LOG_LEVEL=INFO
 ENV SENSU_OPTIONS=
 
 # 
-ENV SENSU_TRANSPORT=rabbitmq://sensu:sensu@sensu-rabbitmq.service.consul:5672/?vhost=/sensu
-ENV SENSU_REDIS=redis://sensu-redis.service.consul:6379
-ENV SENSU_API=api://sensu-api.service.consul:4567
+ENV SENSU_TRANSPORT=rabbitmq://sensu:sensu@rabbitmq:5672/?vhost=/sensu
+ENV SENSU_REDIS=redis://redis:6379
+ENV SENSU_API=api://sensuapi:4567
 
 # Run the configuration converter and then whatever the user has given as an argument
 # to the docker run - useful for debugging (eg docker run $self bash)
