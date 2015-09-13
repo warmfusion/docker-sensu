@@ -1,4 +1,4 @@
-#!/bin/env ruby
+#!/opt/sensu/embedded/bin/ruby
 # 
 # Allows sensu to accept a few environment variables as configuration paths for
 # some of the dependent systems.
@@ -17,11 +17,11 @@
 # License: MIT
 #
 
-require 'cgi'
 require 'uri'
 require 'json'
 
-
+# Needed a deep-merge operation so multiple nested querystring pairs can 
+# get merged into the returning hash alongside eachother
 class ::Hash
     def deep_merge!(second)
         merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : Array === v1 && Array === v2 ? v1 | v2 : [:undefined, nil, :nil].include?(v2) ? v1 : v2 }
@@ -42,8 +42,8 @@ def url_to_hash( uri, default = {} )
   t_type = uri.scheme
   hash[t_type] = {}
 
-  hash[t_type]['host'] = uri.host
-  hash[t_type]['port'] = uri.port
+  hash[t_type]['host'] = uri.host unless uri.host.nil?
+  hash[t_type]['port'] = uri.port unless uri.port.nil?
 
   unless uri.userinfo.nil?
     hash[t_type]['username'] = uri.userinfo.split(':').first
@@ -51,12 +51,14 @@ def url_to_hash( uri, default = {} )
   end
 
   # Additional query string values are added to the configuration hash
-  uri.query.split('&').each do |keypair|
-    key, value = keypair.split('=')
-    # This line is clever; it takes a key with a dot-separated string and turns it into
-    # a nested hash, eg ssl.private_key_file=/etc/my.key will get turned into
-    # { "ssl" => { "private_key_file" => "/etc/my.key" } }
-    hash[t_type].deep_merge! (key.split(".") << value).reverse.inject{|a,n| {n=>a}}
+  unless uri.query.nil?
+    uri.query.split('&').each do |keypair|
+      key, value = keypair.split('=')
+      # This line is clever; it takes a key with a dot-separated string and turns it into
+      # a nested hash, eg ssl.private_key_file=/etc/my.key will get turned into
+      # { "ssl" => { "private_key_file" => "/etc/my.key" } }
+      hash[t_type].deep_merge! (key.split(".") << value).reverse.inject{|a,n| {n=>a}}
+    end
   end
   return hash
 end

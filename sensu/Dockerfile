@@ -15,11 +15,24 @@ RUN \
 COPY bootstrap-sensu-config.rb /bootstrap-sensu-config.rb
 COPY bootstrap-sensu.sh /bootstrap-sensu.sh
 
-VOLUME /etc/sensu
+# Give a starting client.json so we can be sure
+# the sensu-systems have a fighting chance of starting
+# with no additional work from the user.
+COPY conf.d/client.json /etc/sensu/conf.d/client.json
 
+# Make the config directory a volume so people can
+# create their own configs and load them into the container
+VOLUME /etc/sensu/conf.d
+
+# Some default options
 ENV SENSU_LOG_LEVEL=INFO
 ENV SENSU_OPTIONS=
 
-ENV SENSU_TRANSPORT=rmq://sensu:sensu@sensu-rmq.service.consul/sensu
+# 
+ENV SENSU_TRANSPORT=rabbitmq://sensu:sensu@sensu-rabbitmq.service.consul:5672/?vhost=/sensu
+ENV SENSU_REDIS=redis://sensu-redis.service.consul:6379
+ENV SENSU_API=api://sensu-api.service.consul:4567
 
-ENTRYPOINT /bootstrap-sensu.sh
+# Run the configuration converter and then whatever the user has given as an argument
+# to the docker run - useful for debugging (eg docker run $self bash)
+CMD /bootstrap-sensu-config.rb
