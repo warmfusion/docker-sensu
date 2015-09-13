@@ -12,15 +12,14 @@ RUN \
   && apt-get install -y sensu \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install a handy little json editor which i _think_ it'd be possible
-# to configure the endpoints using things like (but no-inline option alas)
-#
-#     jq '.client.name="'$(hostname)'"' config.json.example
-#
-ADD https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 /bin/jq
-RUN chmod 755 /bin/jq
+COPY bootstrap-sensu-config.rb /bootstrap-sensu-config.rb
+COPY bootstrap-sensu.sh /bootstrap-sensu.sh
 
 VOLUME /etc/sensu
 
 ENV SENSU_LOG_LEVEL=INFO
 ENV SENSU_OPTIONS=
+
+ENV SENSU_TRANSPORT=rmq://sensu:sensu@sensu-rmq.service.consul/sensu
+
+ENTRYPOINT /bootstrap-sensu.sh
